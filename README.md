@@ -1,6 +1,5 @@
 # Claude Code + DeepSeek 一键安装包（Windows）
 
-
 > 一键安装 Claude Code，自动配置 DeepSeek API，附带 Node.js 和 Git 自动安装与清理脚本。
 
 ---
@@ -16,13 +15,15 @@
 
 ## ⚙️ 安装
 
-1. **右键** `安装ClaudeCode.bat` → **以管理员身份运行**
+1. 右键 `安装ClaudeCode.bat` → **以管理员身份运行**
 2. 输入你的 [DeepSeek API Key](https://platform.deepseek.com/api_keys)
 3. 安装完成后，在目标文件夹右键 → `Git Bash Here` → 输入 `claude` 启动
 
+---
+
 ## 🧹 卸载
 
-1. **右键** `清理ClaudeCode.bat` → **以管理员身份运行**
+1. 右键 `清理ClaudeCode.bat` → **以管理员身份运行**
 2. 按提示手动卸载 Node.js 和 Git（控制面板）
 3. 删除残留文件夹（可选），重启电脑
 
@@ -41,11 +42,5 @@
 | 问题 | 解决方法 |
 |------|----------|
 | 右键没有 Git Bash Here | 重启电脑 |
-| 安装闪退 | 以管理员运行，暂时关闭杀毒软件 |
-| 验证成功 | `claude --version` 显示版本号 |
-
----
-
-## 📄 许可证
-
-[MIT](LICENSE)
+| 安装闪退 | 以管理员身份运行，暂时关闭杀毒软件 |
+| 如何确认成功 | `claude --version` 显示版本号 |
