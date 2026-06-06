@@ -8,7 +8,7 @@ echo ================================================
 echo.
 
 :: ========== 1. 检测 Node.js ==========
-echo [1/5] 检测 Node.js 环境...
+echo [1/6] 检测 Node.js 环境...
 where node >nul 2>nul
 if %errorlevel% equ 0 (
     for /f "tokens=*" %%i in ('node -v') do echo 已检测到 Node.js %%i
@@ -60,7 +60,7 @@ echo.
 
 :: ========== 2. 检测并自动安装 Git ==========
 :check_git
-echo [2/5] 检测 Git 环境...
+echo [2/6] 检测 Git 环境...
 where git >nul 2>nul
 if %errorlevel% equ 0 (
     echo 已检测到 Git
@@ -115,7 +115,7 @@ echo.
 
 :: ========== 3. 安装 Claude Code ==========
 :install_claude
-echo [3/5] 正在安装 Claude Code...
+echo [3/6] 正在安装 Claude Code...
 echo 请稍候，安装过程可能需要1-2分钟...
 
 set npm_config_color=0
@@ -133,7 +133,7 @@ echo Claude Code 安装成功！
 echo.
 
 :: ========== 4. 配置 DeepSeek API Key ==========
-echo [4/5] 配置 DeepSeek API 连接...
+echo [4/6] 配置 DeepSeek API 连接...
 echo.
 echo 请登录 https://platform.deepseek.com/api_keys 获取 API Key
 set /p "API_KEY=请输入 API Key（直接回车跳过）: "
@@ -146,11 +146,41 @@ if not "%API_KEY%"=="" (
 )
 echo.
 
-:: ========== 5. 完成 ==========
-echo [5/5] 安装完成！
+
+:: ========== 5. 配置 Git Bash 终端支持 ==========
+echo [5/6] 正在配置 Git Bash 终端兼容性...
+
+:: Claude Code 是原生 Windows exe，在 Git Bash (MinTTY) 下
+:: 无法正确检测 TTY，导致报错 "no stdin data received"。
+:: 使用 winpty (Git 自带) 桥接即可解决。
+set "BASH_RC=%USERPROFILE%\.bashrc"
+set "BASH_PROFILE=%USERPROFILE%\.bash_profile"
+set "ALIAS_LINE=alias claude='winpty \claude'"
+set "ALIAS_EXISTS=0"
+
+if exist "%BASH_RC%" (
+    findstr /c:"alias claude=" "%BASH_RC%" >nul 2>nul
+    if not errorlevel 1 set "ALIAS_EXISTS=1"
+)
+
+if "%ALIAS_EXISTS%"=="0" (
+    echo %ALIAS_LINE% >> "%BASH_RC%"
+    echo Git Bash 已配置完成（已添加 winpty 别名）。
+) else (
+    echo Git Bash 别名已存在，跳过。
+)
+
+:: 确保 .bash_profile 能加载 .bashrc（部分 Git Bash 需要）
+if not exist "%BASH_PROFILE%" (
+    echo test -f ~/.bashrc ^&^& source ~/.bashrc > "%BASH_PROFILE%"
+)
+
+echo.
+:: ========== 6. 完成 ==========
+echo [6/6] 安装完成！
 echo.
 echo ================================================
-echo 使用方式：在任意文件夹右键 → Git Bash Here → 输入 claude
+echo 使用方式：在任意文件夹右键 → Git Bash Here → 输入 claude（首次需新开 Git Bash 窗口加载配置）
 echo ================================================
 echo 提示：如果右键没有 Git Bash Here，请重启电脑或注销重新登录。
 pause
