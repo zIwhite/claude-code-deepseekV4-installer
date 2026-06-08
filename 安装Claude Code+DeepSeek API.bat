@@ -116,20 +116,37 @@ echo.
 :: ========== 3. 安装 Claude Code ==========
 :install_claude
 echo [3/6] 正在安装 Claude Code...
-echo 请稍候，安装过程可能需要1-2分钟...
-
 set npm_config_color=0
 call npm install -g @anthropic-ai/claude-code 2>&1
-set INSTALL_RESULT=%errorlevel%
-
-if %INSTALL_RESULT% neq 0 (
-    echo 安装失败，错误码：%INSTALL_RESULT%
+if %errorlevel% neq 0 (
+    echo 安装失败，错误码：%errorlevel%
     echo 请检查网络后重试，或手动执行：npm install -g @anthropic-ai/claude-code
     pause
     exit /b 1
 )
+:: 验证安装结果
+call npm list -g @anthropic-ai/claude-code >nul 2>nul
+if %errorlevel% neq 0 (
+    echo 安装后验证失败，未找到 @anthropic-ai/claude-code
+    pause
+    exit /b 1
+)
+echo Claude Code 安装成功
 
-echo Claude Code 安装成功！
+:: ---------- 配置环境变量和 Git Bash 别名 ----------
+echo 正在配置环境变量和终端别名...
+
+:: 获取 npm 全局安装路径
+for /f "tokens=*" %%i in ('npm config get prefix') do set "NPM_GLOBAL=%%i"
+
+:: 将该路径永久添加到用户 PATH
+setx PATH "%NPM_GLOBAL%;%PATH%" >nul
+
+:: 为 Git Bash 添加正确的别名（注意是 claude.cmd 不是 claude）
+echo alias claude='winpty claude.cmd' >> "%USERPROFILE%\.bashrc"
+
+echo 已完成配置。请关闭所有命令行窗口，然后新开一个 Git Bash 窗口。
+echo 在新窗口中输入 claude 即可启动。
 echo.
 
 :: ========== 4. 配置 DeepSeek API Key ==========
@@ -138,13 +155,12 @@ echo.
 echo 请登录 https://platform.deepseek.com/api_keys 获取 API Key
 set /p "API_KEY=请输入 API Key（直接回车跳过）: "
 if not "%API_KEY%"=="" (
-    setx ANTHROPIC_API_KEY "%API_KEY%" >nul
-    setx ANTHROPIC_BASE_URL "https://api.deepseek.com" >nul
+    setx ANTHROPIC_AUTH_TOKEN "%API_KEY%" >nul
+    setx ANTHROPIC_BASE_URL "https://api.deepseek.com/anthropic" >nul
     echo API Key 已保存。
 ) else (
     echo 未输入 API Key，可稍后手动设置。
 )
-echo.
 
 
 :: ========== 5. 配置 Git Bash 终端支持 ==========
